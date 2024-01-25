@@ -1,10 +1,7 @@
 package com.example.famone.ui.theme.composables
 
-import android.content.Intent
-import android.net.Uri
 import coil.compose.AsyncImage
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -27,24 +24,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import coil.compose.rememberAsyncImagePainter
-import coil.compose.rememberImagePainter
-import com.android.volley.toolbox.ImageRequest
-import com.example.famone.Greeting
-import com.example.famone.data.CardItem
 import com.example.famone.data.Document
-import com.example.famone.ui.theme.FamOneTheme
-import java.net.URI
 import java.text.DateFormat
-import java.text.SimpleDateFormat
 import kotlin.random.Random
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -86,11 +73,9 @@ fun CardItem(item: Document) {
         ) {
         Box(modifier = Modifier.fillMaxSize()) {
 
-            Image(
-                painter = rememberImagePainter(data = Uri.parse(item.imageUrl)),
-                contentDescription = null,
-                modifier = Modifier.fillMaxSize()
-            )
+            item.imageUrl?.let {
+                AsyncImage(modifier = Modifier.fillMaxSize(), model = it, contentDescription = "123")
+            }
 
             Box(
                 modifier = Modifier

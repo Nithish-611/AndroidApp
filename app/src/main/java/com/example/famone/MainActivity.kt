@@ -221,6 +221,7 @@ class MainActivity : ComponentActivity() {
                                                 .clickable {
                                                     Intent(Intent.ACTION_GET_CONTENT).also {
                                                         it.type = "image/*"
+//                                                        it.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
                                                         startActivityForResult(it, 0)
                                                     }
 //                                                    singlePhotoPickerLauncher.launch(
@@ -292,8 +293,6 @@ class MainActivity : ComponentActivity() {
                                         }
                                     },
                                     scrollBehavior = scrollBehaviour
-
-
                                 )
                             }
                         ) { values ->
@@ -330,9 +329,19 @@ class MainActivity : ComponentActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if(resultCode == Activity.RESULT_OK && requestCode==0){
+            val clipData = data?.clipData
+            if (clipData != null) {
+                for (i in 0 until clipData.itemCount) {
+                    val imageUri = clipData.getItemAt(i).uri
+                    // Process each image URI here
+                }
+            } else {
+                val singleImageUri = data?.data
+                // Process the single image URI here
+            }
             val uri = data?.data
             uri?.let{
-                viewModel.upsertDocument(Document(title="Document", dateAdded = System.currentTimeMillis(),imageUrl=it.toString()),this@MainActivity)
+                viewModel.upsertDocument(Document(title="Document", dateAdded = System.currentTimeMillis(),imageUrl= viewModel.getImagePathFromUri(it, this@MainActivity)),this@MainActivity)
             }
         }
     }

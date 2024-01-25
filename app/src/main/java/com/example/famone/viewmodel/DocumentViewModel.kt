@@ -1,7 +1,8 @@
 package com.example.famone.viewmodel
 
+import android.content.ContentResolver
 import android.content.Context
-import androidx.lifecycle.LiveData
+import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.famone.data.Document
@@ -10,6 +11,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import java.io.File
+import java.io.FileOutputStream
 
 
 class DocumentViewModel : ViewModel() {
@@ -31,6 +34,23 @@ class DocumentViewModel : ViewModel() {
         }
     }
 
+    fun getImagePathFromUri(uri: Uri, context: Context): String {
+        val contentResolver: ContentResolver = context.contentResolver
+        val inputStream = contentResolver.openInputStream(uri)
 
+        val tempFile = File.createTempFile("image_${System.currentTimeMillis()}", ".jpg") // Adjust extension as needed
 
+        val outputStream = FileOutputStream(tempFile)
+
+        val buffer = ByteArray(1024)
+        var bytesRead: Int
+        while (inputStream!!.read(buffer).also { bytesRead = it } != -1) {
+            outputStream.write(buffer, 0, bytesRead)
+        }
+
+        outputStream.close()
+        inputStream.close()
+
+        return tempFile.absolutePath
+    }
 }
