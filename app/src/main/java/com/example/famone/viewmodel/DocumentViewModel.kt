@@ -3,6 +3,7 @@ package com.example.famone.viewmodel
 import android.content.ContentResolver
 import android.content.Context
 import android.net.Uri
+import android.text.TextUtils
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.famone.data.Document
@@ -24,33 +25,54 @@ class DocumentViewModel : ViewModel() {
     fun upsertDocument(document: Document, context: Context) {
         viewModelScope.launch(Dispatchers.IO) {
             DocumentDatabase.getDatabase(context).dao.addDocument(document)
-            retrieveDocuments(context)
+            retrieveDocumentsByDate(context)
         }
     }
 
-    fun retrieveDocuments(context: Context) {
+    fun retrieveDocumentsByDate(context: Context) {
         viewModelScope.launch(Dispatchers.IO){
             _docList.value = DocumentDatabase.getDatabase(context).dao.getDocumentsOrderedbyDate()
         }
     }
 
-    fun getImagePathFromUri(uri: Uri, context: Context): String {
+    fun retrieveDocumentsByName(context: Context){
+        viewModelScope.launch(Dispatchers.IO) {
+            _docList.value = DocumentDatabase.getDatabase(context).dao.getDocumentsOrderedbyTitle()
+        }
+    }
+
+    fun getDocumentById(context: Context,documentId:Int){
+        viewModelScope.launch(Dispatchers.IO) {
+            _docList.value = DocumentDatabase.getDatabase(context).dao.getDocumentById(documentId)
+        }
+    }
+
+
+
+    fun getImagePathFromUri(imageList:ArrayList<Uri>, context: Context): String {
         val contentResolver: ContentResolver = context.contentResolver
-        val inputStream = contentResolver.openInputStream(uri)
 
-        val tempFile = File.createTempFile("image_${System.currentTimeMillis()}", ".jpg") // Adjust extension as needed
+        val finalImageList = ArrayList<String>()
 
-        val outputStream = FileOutputStream(tempFile)
+        for(image in imageList){
+            val inputStream = contentResolver.openInputStream(image)
 
-        val buffer = ByteArray(1024)
-        var bytesRead: Int
-        while (inputStream!!.read(buffer).also { bytesRead = it } != -1) {
-            outputStream.write(buffer, 0, bytesRead)
+            val tempFile = File.createTempFile("image_${System.currentTimeMillis()}", ".jpg") // Adjust extension as needed
+
+            val outputStream = FileOutputStream(tempFile)
+
+            val buffer = ByteArray(1024)
+            var bytesRead: Int
+            while (inputStream!!.read(buffer).also { bytesRead = it } != -1) {
+                outputStream.write(buffer, 0, bytesRead)
+            }
+
+            outputStream.close()
+            inputStream.close()
+            finalImageList.add(tempFile.absolutePath)
         }
 
-        outputStream.close()
-        inputStream.close()
 
-        return tempFile.absolutePath
+        return TextUtils.join(",",finalImageList)
     }
 }

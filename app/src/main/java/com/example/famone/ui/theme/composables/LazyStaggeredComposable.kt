@@ -1,5 +1,7 @@
 package com.example.famone.ui.theme.composables
 
+import android.content.Context
+import android.content.Intent
 import coil.compose.AsyncImage
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
@@ -30,6 +32,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat.startActivity
+import com.example.famone.DocumentPreviewActivity
 import com.example.famone.data.Document
 import java.text.DateFormat
 import kotlin.random.Random
@@ -38,33 +42,39 @@ import kotlin.random.Random
 @Composable
 fun LazyStaggeredComposable(
     modifier: Modifier,
-    docList:List<Document>
+    docList:List<Document>,
+    context: Context
 ) {
 
 
     LazyVerticalStaggeredGrid(
         columns = StaggeredGridCells.Fixed(2),
         modifier = modifier,
-        contentPadding = PaddingValues(16.dp),
+        contentPadding = PaddingValues(10.dp),
         horizontalArrangement = Arrangement.spacedBy(16.dp),
         verticalItemSpacing = 16.dp
     ) {
         items(docList) {
-            CardItem(item = it)
+            CardItem(item = it,context)
         }
     }
 
 }
 
 @Composable
-fun CardItem(item: Document) {
+fun CardItem(item: Document,context: Context) {
     println("ak-- ${item.imageUrl}")
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .height(Random.nextInt(100, 200).dp)
+            .height(Random.nextInt(100, 150).dp)
             .background(color = MaterialTheme.colorScheme.background)
             .clickable {
+
+                Intent(context, DocumentPreviewActivity::class.java).also{
+                    it.putExtra("document_id",item.documentId)
+                    startActivity(context,it,null)
+                }
 
             },
         shape = RoundedCornerShape(15.dp),
@@ -74,7 +84,8 @@ fun CardItem(item: Document) {
         Box(modifier = Modifier.fillMaxSize()) {
 
             item.imageUrl?.let {
-                AsyncImage(modifier = Modifier.fillMaxSize(), model = it, contentDescription = "123")
+                val imageUri = it.split(",")[0]
+                AsyncImage(modifier = Modifier.fillMaxSize(), model = imageUri, contentDescription = "123")
             }
 
             Box(
@@ -128,5 +139,4 @@ fun CardItem(item: Document) {
 @Preview(showBackground = true)
 @Composable
 fun GreetingPreview() {
-    CardItem(Document(title="Document", dateAdded = System.currentTimeMillis(),imageUrl="asdfdwer"))
 }

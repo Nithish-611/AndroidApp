@@ -15,10 +15,13 @@ interface DocumentDao {
     @Delete
     suspend fun deleteDocument(document: Document)
 
-    @Query("SELECT * FROM document ORDER BY date_added")
+    @Query("SELECT * FROM document ORDER BY date_added DESC")
     fun getDocumentsOrderedbyDate() : List<Document>
 
     @Query("SELECT * FROM document ORDER BY title ASC")
     fun getDocumentsOrderedbyTitle() : List<Document>
+
+    @Query("SELECT * FROM document WHERE document_id = :documentId")
+    fun getDocumentById(documentId:Int) : List<Document>
 
 }

@@ -10,7 +10,6 @@ import android.os.Bundle
 
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
-import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -38,6 +37,8 @@ import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.DrawerValue
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.FloatingActionButton
@@ -61,8 +62,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.painterResource
@@ -71,15 +70,11 @@ import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
-import androidx.room.Room
 import com.example.famone.data.Document
-import com.example.famone.data.DocumentDatabase
 import com.example.famone.ui.theme.FamOneTheme
 import com.example.famone.ui.theme.composables.LazyStaggeredComposable
 import com.example.famone.viewmodel.DocumentViewModel
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
-import java.util.Vector
 
 data class NavigationItem(
     var title: String,
@@ -104,7 +99,7 @@ class MainActivity : ComponentActivity() {
 
         viewModel = ViewModelProvider(this@MainActivity)[DocumentViewModel::class.java]
 
-        viewModel.retrieveDocuments(this@MainActivity)
+        viewModel.retrieveDocumentsByDate(this@MainActivity)
 
 
 
@@ -118,14 +113,6 @@ class MainActivity : ComponentActivity() {
                 var selectedImageUris by remember {
                     mutableStateOf<List<Uri>>(emptyList())
                 }
-                val singlePhotoPickerLauncher = rememberLauncherForActivityResult(
-                    contract = ActivityResultContracts.PickVisualMedia(),
-                    onResult = { uri -> selectedImageUri = uri }
-                )
-                val multiplePhotoPickerLauncher = rememberLauncherForActivityResult(
-                    contract = ActivityResultContracts.PickMultipleVisualMedia(),
-                    onResult = { uris -> selectedImageUris = uris }
-                )
 
                 val drawerItems = listOf(
 
@@ -166,6 +153,9 @@ class MainActivity : ComponentActivity() {
                     val scope = rememberCoroutineScope()
                     var selectedItemIndex by rememberSaveable {
                         mutableStateOf(0)
+                    }
+                    var expanded by remember{
+                        mutableStateOf(false)
                     }
                     ModalNavigationDrawer(
                         drawerContent = {
@@ -221,7 +211,7 @@ class MainActivity : ComponentActivity() {
                                                 .clickable {
                                                     Intent(Intent.ACTION_GET_CONTENT).also {
                                                         it.type = "image/*"
-//                                                        it.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
+                                                        it.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
                                                         startActivityForResult(it, 0)
                                                     }
 //                                                    singlePhotoPickerLauncher.launch(
@@ -285,11 +275,34 @@ class MainActivity : ComponentActivity() {
                                             )
                                         }
 
-                                        IconButton(onClick = { /*TODO*/ }) {
+                                        IconButton(onClick = { expanded = true  }) {
                                             Icon(
                                                 painter = painterResource(id = R.drawable.baseline_sortfilter_alt_24),
                                                 contentDescription = "SortBy"
                                             )
+                                        }
+
+                                        DropdownMenu(
+                                            expanded = expanded,
+                                            onDismissRequest = { expanded = false }
+                                        ) {
+                                            DropdownMenuItem(
+                                                text = { Text("Sort by Name") },
+                                                onClick = {
+                                                    expanded = false
+                                                    viewModel.retrieveDocumentsByName(this@MainActivity)
+
+                                                }
+                                            )
+                                            DropdownMenuItem(
+                                                text = { Text("Sort by Date") },
+                                                onClick = {
+                                                    expanded = false
+                                                    viewModel.retrieveDocumentsByDate(this@MainActivity)
+
+                                                }
+                                            )
+
                                         }
                                     },
                                     scrollBehavior = scrollBehaviour
@@ -301,7 +314,8 @@ class MainActivity : ComponentActivity() {
                             LazyStaggeredComposable(modifier = Modifier
                                 .padding(top = 56.dp)
                                 .fillMaxSize(),
-                                docList
+                                docList,
+                                context = this@MainActivity
                             )
                         }
                     }
@@ -330,19 +344,23 @@ class MainActivity : ComponentActivity() {
         super.onActivityResult(requestCode, resultCode, data)
         if(resultCode == Activity.RESULT_OK && requestCode==0){
             val clipData = data?.clipData
+            val imageList = ArrayList<Uri>()
             if (clipData != null) {
                 for (i in 0 until clipData.itemCount) {
                     val imageUri = clipData.getItemAt(i).uri
                     // Process each image URI here
+                    imageList.add(imageUri)
                 }
             } else {
                 val singleImageUri = data?.data
+                if (singleImageUri != null) {
+                    imageList.add(singleImageUri)
+                }
                 // Process the single image URI here
             }
-            val uri = data?.data
-            uri?.let{
-                viewModel.upsertDocument(Document(title="Document", dateAdded = System.currentTimeMillis(),imageUrl= viewModel.getImagePathFromUri(it, this@MainActivity)),this@MainActivity)
-            }
+
+            viewModel.upsertDocument(Document(title="Document", dateAdded = System.currentTimeMillis(),imageUrl= viewModel.getImagePathFromUri(imageList, this@MainActivity)),this@MainActivity)
+
         }
     }
 }
