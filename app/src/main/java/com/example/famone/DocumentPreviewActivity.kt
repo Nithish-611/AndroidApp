@@ -35,6 +35,7 @@ import androidx.lifecycle.ViewModelProvider
 import coil.compose.AsyncImage
 import com.example.famone.ui.theme.FamOneTheme
 import com.example.famone.ui.theme.composables.MyDatePickerDialog
+import com.example.famone.utils.NotificationUtil
 import com.example.famone.viewmodel.DocumentViewModel
 
 class DocumentPreviewActivity : ComponentActivity() {
@@ -121,6 +122,17 @@ class DocumentPreviewActivity : ComponentActivity() {
                                 colors = ButtonDefaults.buttonColors(containerColor = Color.LightGray))
                             {
                                 Text(text = date.value, fontSize = 24.sp)
+                            }
+                        }
+                        Box(contentAlignment = Alignment.Center) {
+                            Button(
+                                modifier = Modifier.padding(top = 16.dp, start = 16.dp, end = 16.dp),
+                                onClick = {
+                                    NotificationUtil.triggerDummyNotification(applicationContext)
+                                          },
+                                colors = ButtonDefaults.buttonColors(containerColor = Color.LightGray))
+                            {
+                                Text(text = "Trigger notification", fontSize = 24.sp)
                             }
                         }
 
