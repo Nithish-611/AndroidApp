@@ -1,7 +1,7 @@
 package com.example.famone
 
-import android.net.Uri
 import android.os.Bundle
+import android.text.TextUtils
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -47,15 +47,10 @@ class DocumentPreviewActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         viewModel = ViewModelProvider(this)[DocumentViewModel::class.java]
-
-//        val documentId = intent.getIntExtra("document_id", 0)
-//        viewModel.getDocumentById(this, documentId)
-
-        val documentName = intent.getStringExtra("document_name")
+        var documentName = intent.getStringExtra("document_name")
         val imageListString = intent.getStringExtra("image_list")
         var imageList = imageListString?.split(",")
-
-        if(imageList==null){
+        if(imageListString==null){
             val documentId = intent.getIntExtra("document_id", 0)
             viewModel.getDocumentById(this, documentId)
         }
@@ -68,9 +63,10 @@ class DocumentPreviewActivity : ComponentActivity() {
             FamOneTheme {
 
                 var document: Document? = null
-                if(imageList==null){
+                if(imageListString==null){
                     document = viewModel.docList.collectAsState().value[0]
                     val image = document.imageUrl
+                    documentName = document.title
                     imageList = image.split(",")
                 }
 
@@ -161,10 +157,11 @@ class DocumentPreviewActivity : ComponentActivity() {
                                 modifier = Modifier.padding(top = 16.dp, start = 16.dp, end = 16.dp).fillMaxWidth(),
                                 onClick = {
                                     if(document != null){
-                                        viewModel.upsertDocument(Document(documentId = document.documentId,textState.value.text,System.currentTimeMillis(),imageList.toString()),this@DocumentPreviewActivity)
+                                        viewModel.upsertDocument(Document(documentId = document.documentId,textState.value.text,System.currentTimeMillis(),
+                                            TextUtils.join(",", imageList!!)),this@DocumentPreviewActivity)
                                         finish()
                                     }else{
-                                        viewModel.upsertDocument(Document(title = textState.value.text, dateAdded = System.currentTimeMillis(), imageUrl = imageList.toString()),this@DocumentPreviewActivity)
+                                        viewModel.upsertDocument(Document(title = textState.value.text, dateAdded = System.currentTimeMillis(), imageUrl = TextUtils.join(",", imageList!!)),this@DocumentPreviewActivity)
                                         finish()
                                     }
                                 },
