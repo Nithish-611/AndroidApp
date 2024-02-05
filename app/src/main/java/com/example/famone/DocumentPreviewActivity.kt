@@ -1,5 +1,6 @@
 package com.example.famone
 
+import android.net.Uri
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -33,10 +34,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModelProvider
 import coil.compose.AsyncImage
+import com.example.famone.data.Document
 import com.example.famone.ui.theme.FamOneTheme
 import com.example.famone.ui.theme.composables.MyDatePickerDialog
 import com.example.famone.utils.NotificationUtil
 import com.example.famone.viewmodel.DocumentViewModel
+
 
 class DocumentPreviewActivity : ComponentActivity() {
     @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
@@ -45,21 +48,37 @@ class DocumentPreviewActivity : ComponentActivity() {
 
         viewModel = ViewModelProvider(this)[DocumentViewModel::class.java]
 
-        val documentId = intent.getIntExtra("document_id", 0)
-        viewModel.getDocumentById(this, documentId)
+//        val documentId = intent.getIntExtra("document_id", 0)
+//        viewModel.getDocumentById(this, documentId)
+
+        val documentName = intent.getStringExtra("document_name")
+        val imageListString = intent.getStringExtra("image_list")
+        var imageList = imageListString?.split(",")
+
+        if(imageList==null){
+            val documentId = intent.getIntExtra("document_id", 0)
+            viewModel.getDocumentById(this, documentId)
+        }
+
+
 
 
 
         setContent {
             FamOneTheme {
 
-                val document = viewModel.docList.collectAsState().value[0]
-                val image = document.imageUrl
-                val imageList = image.split(",")
+                var document: Document? = null
+                if(imageList==null){
+                    document = viewModel.docList.collectAsState().value[0]
+                    val image = document.imageUrl
+                    imageList = image.split(",")
+                }
+
+
 
 
                 val pagerState = rememberPagerState()
-                val textState = remember { mutableStateOf(TextFieldValue(document.title ?: "")) }
+                val textState = remember { mutableStateOf(TextFieldValue(documentName ?: "")) }
 
                 val isDateTimePickerVisible = remember { mutableStateOf(false) }
                 val date = remember {
@@ -77,21 +96,23 @@ class DocumentPreviewActivity : ComponentActivity() {
                 {
 
                     Column {
-                        HorizontalPager(
-                            pageCount = imageList.size,
-                            state = pagerState,
-                            key = { imageList[it] },
-                            pageSize = PageSize.Fill,
-                            modifier = Modifier
-                                .padding(start = 16.dp, end = 16.dp, top = 100.dp)
-                                .fillMaxWidth()
-                                .height(360.dp)
-                        ) { index ->
-                            AsyncImage(
-                                modifier = Modifier.fillMaxSize(),
-                                model = imageList[index],
-                                contentDescription = "123"
-                            )
+                        if (imageList != null) {
+                            HorizontalPager(
+                                pageCount = imageList!!.size,
+                                state = pagerState,
+                                key = { imageList!![it] },
+                                pageSize = PageSize.Fill,
+                                modifier = Modifier
+                                    .padding(start = 16.dp, end = 16.dp, top = 100.dp)
+                                    .fillMaxWidth()
+                                    .height(360.dp)
+                            ) { index ->
+                                AsyncImage(
+                                    modifier = Modifier.fillMaxSize(),
+                                    model = imageList!![index],
+                                    contentDescription = "123"
+                                )
+                            }
                         }
 
                         TextField(
@@ -133,6 +154,23 @@ class DocumentPreviewActivity : ComponentActivity() {
                                 colors = ButtonDefaults.buttonColors(containerColor = Color.LightGray))
                             {
                                 Text(text = "Trigger notification", fontSize = 24.sp)
+                            }
+                        }
+                        Box(contentAlignment = Alignment.Center) {
+                            Button(
+                                modifier = Modifier.padding(top = 16.dp, start = 16.dp, end = 16.dp).fillMaxWidth(),
+                                onClick = {
+                                    if(document != null){
+                                        viewModel.upsertDocument(Document(documentId = document.documentId,textState.value.text,System.currentTimeMillis(),imageList.toString()),this@DocumentPreviewActivity)
+                                        finish()
+                                    }else{
+                                        viewModel.upsertDocument(Document(title = textState.value.text, dateAdded = System.currentTimeMillis(), imageUrl = imageList.toString()),this@DocumentPreviewActivity)
+                                        finish()
+                                    }
+                                },
+                                colors = ButtonDefaults.buttonColors(containerColor = Color.Green))
+                            {
+                                Text(text = "Save", fontSize = 24.sp)
                             }
                         }
 

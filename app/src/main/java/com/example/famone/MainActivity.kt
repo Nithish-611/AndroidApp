@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.*
 import android.provider.MediaStore
+import android.text.TextUtils
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Spacer
@@ -75,6 +76,7 @@ import com.example.famone.ui.theme.FamOneTheme
 import com.example.famone.ui.theme.composables.LazyStaggeredComposable
 import com.example.famone.viewmodel.DocumentViewModel
 import kotlinx.coroutines.launch
+import kotlin.random.Random
 
 data class NavigationItem(
     var title: String,
@@ -87,6 +89,12 @@ lateinit var viewModel:DocumentViewModel
 
 
 class MainActivity : ComponentActivity() {
+
+    override fun onResume() {
+        super.onResume()
+        viewModel.retrieveDocumentsByDate(this@MainActivity)
+    }
+
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -359,7 +367,16 @@ class MainActivity : ComponentActivity() {
                 // Process the single image URI here
             }
 
-            viewModel.upsertDocument(Document(title="Document", dateAdded = System.currentTimeMillis(),imageUrl= viewModel.getImagePathFromUri(imageList, this@MainActivity)),this@MainActivity)
+            Intent(this@MainActivity, DocumentPreviewActivity::class.java).also{
+                var docName = "Doc"+ Random.nextInt(20);
+                val imgList = viewModel.getImagePathFromUri(imageList,this)
+                it.putExtra("document_name",docName)
+                it.putExtra("image_list", imgList);
+
+                ContextCompat.startActivity(this@MainActivity, it, null)
+            }
+
+//            viewModel.upsertDocument(Document(title="Document", dateAdded = System.currentTimeMillis(),imageUrl= viewModel.getImagePathFromUri(imageList, this@MainActivity)),this@MainActivity)
 
         }
     }
