@@ -8,14 +8,11 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
 
-import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.*
 import android.provider.MediaStore
-import android.text.TextUtils
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Spacer
@@ -71,7 +68,6 @@ import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
-import com.example.famone.data.Document
 import com.example.famone.ui.theme.FamOneTheme
 import com.example.famone.ui.theme.composables.LazyStaggeredComposable
 import com.example.famone.viewmodel.DocumentViewModel
@@ -92,6 +88,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onResume() {
         super.onResume()
+        viewModel = ViewModelProvider(this@MainActivity)[DocumentViewModel::class.java]
         viewModel.retrieveDocumentsByDate(this@MainActivity)
     }
 
@@ -105,22 +102,8 @@ class MainActivity : ComponentActivity() {
         }
 
 
-        viewModel = ViewModelProvider(this@MainActivity)[DocumentViewModel::class.java]
-
-        viewModel.retrieveDocumentsByDate(this@MainActivity)
-
-
-
         setContent {
             FamOneTheme {
-                // A surface container using the 'background' color from the theme
-
-                var selectedImageUri by remember {
-                    mutableStateOf<Uri?>(null)
-                }
-                var selectedImageUris by remember {
-                    mutableStateOf<List<Uri>>(emptyList())
-                }
 
                 val drawerItems = listOf(
 
@@ -178,7 +161,7 @@ class MainActivity : ComponentActivity() {
                                         onClick = {
                                             selectedItemIndex = index
                                             scope.launch {
-//                                                drawerState.close()
+                                                drawerState.close()
                                             }
                                         },
                                         icon = {
@@ -222,13 +205,6 @@ class MainActivity : ComponentActivity() {
                                                         it.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
                                                         startActivityForResult(it, 0)
                                                     }
-//                                                    singlePhotoPickerLauncher.launch(
-//                                                        PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
-//                                                    )
-//                                                    viewModel.upsertDocument(Document(
-//                                                        title ="Document", dateAdded = System.currentTimeMillis(),
-//                                                        imageUrl =selectedImageUri.toString()),this@MainActivity)
-
                                                 },
                                             painter = painterResource(id = R.drawable.ic_open_gallery_foreground),
                                             contentDescription = "open gallery"
@@ -368,16 +344,13 @@ class MainActivity : ComponentActivity() {
             }
 
             Intent(this@MainActivity, DocumentPreviewActivity::class.java).also{
-                var docName = "Doc"+ Random.nextInt(20);
+                val docName = "Doc"+ Random.nextInt(20);
                 val imgList = viewModel.getImagePathFromUri(imageList,this)
                 it.putExtra("document_name",docName)
                 it.putExtra("image_list", imgList);
 
                 ContextCompat.startActivity(this@MainActivity, it, null)
             }
-
-//            viewModel.upsertDocument(Document(title="Document", dateAdded = System.currentTimeMillis(),imageUrl= viewModel.getImagePathFromUri(imageList, this@MainActivity)),this@MainActivity)
-
         }
     }
 }
