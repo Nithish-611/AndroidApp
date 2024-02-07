@@ -7,6 +7,7 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
+import com.example.famone.utils.DocumentUtil
 
 @Composable
 fun CategoryDropDown(expanded: MutableState<Boolean>, selectedOption: MutableState<String>) {
@@ -16,27 +17,16 @@ fun CategoryDropDown(expanded: MutableState<Boolean>, selectedOption: MutableSta
             expanded = expanded.value,
             onDismissRequest = { expanded.value = false },
         ) {
-            DropdownMenuItem(
-                text = {Text("Electronics")},
-                onClick = {
-                    selectedOption.value = "Electronics"
-                    expanded.value = false
-                }
-            )
-            DropdownMenuItem(
-                text = {Text("Household")},
-                onClick = {
-                    selectedOption.value = "Household"
-                    expanded.value = false
-                }
-            )
-            DropdownMenuItem(
-                text = {Text("General")},
-                onClick = {
-                    selectedOption.value = "General"
-                    expanded.value = false
-                }
-            )
+            val list = DocumentUtil.getCategories()
+            for (item in list){
+                DropdownMenuItem(
+                    text = {Text(item)},
+                    onClick = {
+                        selectedOption.value = item
+                        expanded.value = false
+                    }
+                )
+            }
         }
     }
 }

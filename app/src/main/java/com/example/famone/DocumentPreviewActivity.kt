@@ -98,7 +98,7 @@ class DocumentPreviewActivity : ComponentActivity() {
                 val keyboardController = LocalSoftwareKeyboardController.current
                 val isDateTimePickerVisible = remember { mutableStateOf(false) }
                 val isCategoryDropDownVisible = remember { mutableStateOf(false) }
-                val selectedCategory = remember { mutableStateOf(document?.categoryType?:"General") }
+                val selectedCategory = remember { mutableStateOf(document?.categoryType?:"Miscellaneous") }
                 val date = remember {
                     mutableStateOf(DateUtil.millisToDate(document?.reminderTime))
                 }
