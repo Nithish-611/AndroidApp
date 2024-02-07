@@ -17,10 +17,9 @@ import androidx.compose.foundation.pager.PageSize
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
@@ -111,13 +110,12 @@ class DocumentPreviewActivity : ComponentActivity() {
                                 )
                             }
                         }
-
-                        TextField(
+                        OutlinedTextField(
                             value = textState.value,
                             onValueChange = {
                                 textState.value = it
                             },
-                            label = { Text(text = "Document Title") },
+                            label = { Text(text = "Title", color = Color.White) },
                             modifier = Modifier
                                 .padding(top = 16.dp, start = 16.dp, end = 16.dp)
                                 .fillMaxWidth(),
@@ -125,14 +123,13 @@ class DocumentPreviewActivity : ComponentActivity() {
                                 fontSize = 24.sp
                             ),
                             colors = TextFieldDefaults.colors(
-                                focusedTextColor = Color.Black,
-                                unfocusedTextColor = Color.Black,
-                                focusedContainerColor = Color.LightGray,
-                                unfocusedContainerColor = Color.LightGray,
-                                disabledContainerColor = Color.LightGray,
-                                focusedIndicatorColor = Color.Black,
-                                focusedLabelColor = Color.DarkGray,
-                                unfocusedLabelColor = Color.Black,
+                                focusedTextColor = Color.White,
+                                unfocusedTextColor = Color.White,
+                                focusedIndicatorColor = Color.White,
+                                focusedLabelColor = Color.White,
+                                unfocusedLabelColor = Color.White,
+                                focusedContainerColor = MaterialTheme.colorScheme.background,
+                                unfocusedContainerColor = MaterialTheme.colorScheme.background
                             )
                         )
                         Box(contentAlignment = Alignment.Center) {
