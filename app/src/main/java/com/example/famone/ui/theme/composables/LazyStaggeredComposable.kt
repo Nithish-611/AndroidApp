@@ -67,15 +67,13 @@ fun CardItem(item: Document,context: Context) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .height(Random.nextInt(100, 150).dp)
+            .height(item.cardHeight.dp)
             .background(color = MaterialTheme.colorScheme.background)
             .clickable {
-
                 Intent(context, DocumentPreviewActivity::class.java).also{
                     it.putExtra("document_id",item.documentId)
                     startActivity(context,it,null)
                 }
-
             },
         shape = RoundedCornerShape(15.dp),
 
@@ -83,7 +81,7 @@ fun CardItem(item: Document,context: Context) {
         ) {
         Box(modifier = Modifier.fillMaxSize()) {
 
-            item.imageUrl?.let {
+            item.imageUrl.let {
                 val imageUri = it.split(",")[0]
                 AsyncImage(modifier = Modifier.fillMaxSize(), model = imageUri, contentDescription = "123")
             }

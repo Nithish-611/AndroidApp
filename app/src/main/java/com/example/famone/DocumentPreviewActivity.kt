@@ -37,12 +37,13 @@ import coil.compose.AsyncImage
 import com.example.famone.data.Document
 import com.example.famone.ui.theme.FamOneTheme
 import com.example.famone.ui.theme.composables.MyDatePickerDialog
+import com.example.famone.utils.DateUtil
 import com.example.famone.utils.NotificationUtil
 import com.example.famone.viewmodel.DocumentViewModel
 
 
 class DocumentPreviewActivity : ComponentActivity() {
-    @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
+    @OptIn(ExperimentalFoundationApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -78,7 +79,7 @@ class DocumentPreviewActivity : ComponentActivity() {
 
                 val isDateTimePickerVisible = remember { mutableStateOf(false) }
                 val date = remember {
-                    mutableStateOf("Set reminder")
+                    mutableStateOf(DateUtil.millisToDate(document?.reminderTime))
                 }
 
                 Box(
@@ -123,13 +124,15 @@ class DocumentPreviewActivity : ComponentActivity() {
                             textStyle = TextStyle(
                                 fontSize = 24.sp
                             ),
-                            colors = TextFieldDefaults.textFieldColors(
-                                containerColor = Color.LightGray,
+                            colors = TextFieldDefaults.colors(
                                 focusedTextColor = Color.Black,
                                 unfocusedTextColor = Color.Black,
+                                focusedContainerColor = Color.LightGray,
+                                unfocusedContainerColor = Color.LightGray,
+                                disabledContainerColor = Color.LightGray,
+                                focusedIndicatorColor = Color.Black,
                                 focusedLabelColor = Color.DarkGray,
                                 unfocusedLabelColor = Color.Black,
-                                focusedIndicatorColor = Color.Black
                             )
                         )
                         Box(contentAlignment = Alignment.Center) {
@@ -157,11 +160,23 @@ class DocumentPreviewActivity : ComponentActivity() {
                                 modifier = Modifier.padding(top = 16.dp, start = 16.dp, end = 16.dp).fillMaxWidth(),
                                 onClick = {
                                     if(document != null){
-                                        viewModel.upsertDocument(Document(documentId = document.documentId,textState.value.text,System.currentTimeMillis(),
-                                            TextUtils.join(",", imageList!!)),this@DocumentPreviewActivity)
+                                        viewModel.upsertDocument(
+                                            Document(
+                                                documentId = document.documentId,
+                                                title = textState.value.text,
+                                                dateAdded = System.currentTimeMillis(),
+                                                imageUrl = TextUtils.join(",", imageList!!),
+                                                reminderTime = DateUtil.dateToMillis(date.value)
+                                            ),this@DocumentPreviewActivity)
                                         finish()
                                     }else{
-                                        viewModel.upsertDocument(Document(title = textState.value.text, dateAdded = System.currentTimeMillis(), imageUrl = TextUtils.join(",", imageList!!)),this@DocumentPreviewActivity)
+                                        viewModel.upsertDocument(
+                                            Document(
+                                                title = textState.value.text,
+                                                dateAdded = System.currentTimeMillis(),
+                                                imageUrl = TextUtils.join(",", imageList!!),
+                                                reminderTime = DateUtil.dateToMillis(date.value)
+                                            ),this@DocumentPreviewActivity)
                                         finish()
                                     }
                                 },
