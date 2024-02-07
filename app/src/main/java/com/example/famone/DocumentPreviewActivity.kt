@@ -4,21 +4,32 @@ import android.os.Bundle
 import android.text.TextUtils
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PageSize
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Close
+import androidx.compose.material.icons.outlined.DateRange
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.collectAsState
@@ -99,9 +110,9 @@ class DocumentPreviewActivity : ComponentActivity() {
                                 key = { imageList!![it] },
                                 pageSize = PageSize.Fill,
                                 modifier = Modifier
-                                    .padding(start = 16.dp, end = 16.dp, top = 100.dp)
+                                    .padding(start = 16.dp, end = 16.dp, top = 56.dp)
                                     .fillMaxWidth()
-                                    .height(360.dp)
+                                    .height(200.dp)
                             ) { index ->
                                 AsyncImage(
                                     modifier = Modifier.fillMaxSize(),
@@ -110,6 +121,7 @@ class DocumentPreviewActivity : ComponentActivity() {
                                 )
                             }
                         }
+                        // Title
                         OutlinedTextField(
                             value = textState.value,
                             onValueChange = {
@@ -120,7 +132,7 @@ class DocumentPreviewActivity : ComponentActivity() {
                                 .padding(top = 16.dp, start = 16.dp, end = 16.dp)
                                 .fillMaxWidth(),
                             textStyle = TextStyle(
-                                fontSize = 24.sp
+                                fontSize = 17.sp
                             ),
                             colors = TextFieldDefaults.colors(
                                 focusedTextColor = Color.White,
@@ -132,13 +144,21 @@ class DocumentPreviewActivity : ComponentActivity() {
                                 unfocusedContainerColor = MaterialTheme.colorScheme.background
                             )
                         )
-                        Box(contentAlignment = Alignment.Center) {
-                            Button(
-                                modifier = Modifier.padding(top = 16.dp, start = 16.dp, end = 16.dp),
-                                onClick = { isDateTimePickerVisible.value = true },
-                                colors = ButtonDefaults.buttonColors(containerColor = Color.LightGray))
-                            {
-                                Text(text = date.value, fontSize = 24.sp)
+
+                        // Set reminders
+                        Surface(
+                            modifier = Modifier.padding(16.dp).fillMaxWidth(),
+                            color = Color.Transparent,
+                            border = BorderStroke(1.dp, Color.LightGray),
+                            shape = RoundedCornerShape(4.dp)
+                        ) {
+                            Row( modifier = Modifier.padding(16.dp).clickable {
+                                isDateTimePickerVisible.value = true
+                            }, verticalAlignment = Alignment.CenterVertically) {
+                                Icon(modifier = Modifier.size(24.dp), imageVector = Icons.Outlined.DateRange, contentDescription = "", tint = Color.White)
+                                Text(modifier = Modifier.padding(start = 12.dp), text = date.value, fontSize = 17.sp, color = Color.White)
+                                Spacer(modifier = Modifier.weight(1f))
+                                Icon(modifier = Modifier.size(24.dp), imageVector = Icons.Outlined.Close, contentDescription = "", tint = Color.White)
                             }
                         }
                         Box(contentAlignment = Alignment.Center) {
@@ -154,7 +174,9 @@ class DocumentPreviewActivity : ComponentActivity() {
                         }
                         Box(contentAlignment = Alignment.Center) {
                             Button(
-                                modifier = Modifier.padding(top = 16.dp, start = 16.dp, end = 16.dp).fillMaxWidth(),
+                                modifier = Modifier
+                                    .padding(top = 16.dp, start = 16.dp, end = 16.dp)
+                                    .fillMaxWidth(),
                                 onClick = {
                                     if(document != null){
                                         viewModel.upsertDocument(
