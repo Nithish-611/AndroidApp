@@ -27,4 +27,7 @@ interface DocumentDao {
     @Query("SELECT * FROM document WHERE category_type = :category")
     fun getDocumentByCategory(category: String) : List<Document>
 
+    @Query("SELECT * FROM document WHERE reminder_time > 0 order by reminder_time asc")
+    fun getDocumentByReminder() : List<Document>
+
 }

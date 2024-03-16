@@ -160,9 +160,29 @@ class MainActivity : ComponentActivity() {
                                         selected = index == selectedItemIndex,
                                         onClick = {
                                             selectedItemIndex = index
-                                            Intent(this@MainActivity,AllDocumentsActivity::class.java).also {
-                                                startActivity(it)
+                                            when(index){
+                                                0 -> {}
+                                                1 -> {
+                                                    Intent(this@MainActivity,AllDocumentsActivity::class.java).also {
+                                                        startActivity(it)
+                                                    }
+                                                }
+                                                2 -> {
+                                                    Intent(
+                                                        this@MainActivity,
+                                                        ListDocumentsActivity::class.java
+                                                    ).also {
+                                                        it.putExtra("title", "Reminders")
+                                                        it.putExtra("isReminder", true)
+                                                        ContextCompat.startActivity(
+                                                            this@MainActivity,
+                                                            it,
+                                                            null
+                                                        )
+                                                    }
+                                                }
                                             }
+
 
                                         },
                                         icon = {

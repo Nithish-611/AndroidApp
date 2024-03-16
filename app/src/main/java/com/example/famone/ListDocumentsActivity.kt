@@ -34,11 +34,16 @@ class ListDocumentsActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         viewModel = ViewModelProvider(this)[DocumentViewModel::class.java]
-        val category = intent.getStringExtra("category")
         val title = intent.getStringExtra("title")
 
-        if(category != null){
-            viewModel.getDocumentByCategory(this, category)
+        val isReminder = intent.getBooleanExtra("isReminder", false)
+        if(isReminder){
+            viewModel.getDocumentByReminder(this)
+        }else{
+            val category = intent.getStringExtra("category")
+            if(category != null){
+                viewModel.getDocumentByCategory(this, category)
+            }
         }
         setContent {
             FamOneTheme {
@@ -65,11 +70,9 @@ class ListDocumentsActivity : ComponentActivity() {
                         Column(
                             modifier = Modifier
                                 .fillMaxSize()
-                                .padding(top = 32.dp, start = 16.dp, end = 16.dp)
                                 .background(Color.Black)
-
+                                .padding(top = 32.dp, start = 16.dp, end = 16.dp)
                         ) {
-                            Spacer(modifier = Modifier.height(56.dp))
                             val docList = viewModel.docList.collectAsState().value
                             LazyStaggeredComposable(
                                 modifier = Modifier

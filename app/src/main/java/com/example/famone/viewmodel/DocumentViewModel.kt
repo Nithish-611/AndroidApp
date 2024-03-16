@@ -53,6 +53,12 @@ class DocumentViewModel : ViewModel() {
         }
     }
 
+    fun getDocumentByReminder(context: Context){
+        viewModelScope.launch(Dispatchers.IO) {
+            _docList.value = DocumentDatabase.getDatabase(context).dao.getDocumentByReminder()
+        }
+    }
+
 
 
     fun getImagePathFromUri(imageList:ArrayList<Uri>, context: Context): String {
