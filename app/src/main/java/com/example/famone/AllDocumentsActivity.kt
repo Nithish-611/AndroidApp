@@ -67,10 +67,8 @@ class AllDocumentsActivity : ComponentActivity() {
                     content = {
                         Column(
                             modifier = Modifier
-                                .fillMaxSize()
+                                .fillMaxSize().background(Color.Black)
                                 .padding(top = 32.dp, start = 16.dp, end = 16.dp)
-                                .background(Color.Black)
-
                         ) {
                             Spacer(modifier = Modifier.height(56.dp))
                             LazyVerticalGrid(

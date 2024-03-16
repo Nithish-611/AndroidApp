@@ -19,10 +19,12 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Create
@@ -63,12 +65,16 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
@@ -378,12 +384,28 @@ class MainActivity : ComponentActivity() {
                         ) { values ->
                             val t=values
                             val docList = viewModel.docList.collectAsState().value
-                            LazyStaggeredComposable(modifier = Modifier
-                                .padding(top = 56.dp)
-                                .fillMaxSize(),
-                                docList,
-                                context = this@MainActivity
-                            )
+                            if(docList.isEmpty()){
+                                Box(
+                                    modifier = Modifier.fillMaxSize(),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Text(
+                                        text = "Get Started!",
+                                        fontSize = 24.sp,
+                                        color = Color.White,
+                                        textAlign = TextAlign.Center,
+                                        modifier = Modifier.wrapContentSize()
+                                    )
+                                }
+                            }else {
+                                LazyStaggeredComposable(
+                                    modifier = Modifier
+                                        .padding(top = 56.dp)
+                                        .fillMaxSize(),
+                                    docList,
+                                    context = this@MainActivity
+                                )
+                            }
                         }
                     }
                 }
