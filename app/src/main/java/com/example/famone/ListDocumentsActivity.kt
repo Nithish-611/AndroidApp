@@ -224,7 +224,7 @@ class ListDocumentsActivity : ComponentActivity() {
             }
 
             Intent(this@ListDocumentsActivity, DocumentPreviewActivity::class.java).also{
-                val docName = "Doc"+ Random.nextInt(20);
+                val docName = "Doc"+ Random.nextInt(1000);
                 val imgList = viewModel.getImagePathFromUri(imageList,this)
                 it.putExtra("document_name",docName)
                 it.putExtra("image_list", imgList)
