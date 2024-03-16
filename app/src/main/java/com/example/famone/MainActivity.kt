@@ -13,7 +13,11 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.*
 import android.provider.MediaStore
+import android.widget.Toast
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.IntentSenderRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
@@ -71,6 +75,12 @@ import androidx.lifecycle.ViewModelProvider
 import com.example.famone.ui.theme.FamOneTheme
 import com.example.famone.ui.theme.composables.LazyStaggeredComposable
 import com.example.famone.viewmodel.DocumentViewModel
+import com.google.mlkit.vision.documentscanner.GmsDocumentScannerOptions
+import com.google.mlkit.vision.documentscanner.GmsDocumentScannerOptions.RESULT_FORMAT_JPEG
+import com.google.mlkit.vision.documentscanner.GmsDocumentScannerOptions.RESULT_FORMAT_PDF
+import com.google.mlkit.vision.documentscanner.GmsDocumentScannerOptions.SCANNER_MODE_FULL
+import com.google.mlkit.vision.documentscanner.GmsDocumentScanning
+import com.google.mlkit.vision.documentscanner.GmsDocumentScanningResult
 import kotlinx.coroutines.launch
 import kotlin.random.Random
 
@@ -95,6 +105,14 @@ class MainActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        val options = GmsDocumentScannerOptions.Builder()
+            .setScannerMode(SCANNER_MODE_FULL)
+            .setGalleryImportAllowed(true)
+            .setResultFormats(RESULT_FORMAT_JPEG, RESULT_FORMAT_PDF)
+            .build()
+        val scanner = GmsDocumentScanning.getClient(options)
+
         if(!hasRequiredPermissions()){
             ActivityCompat.requestPermissions(
                 this,CAMERAX_PERMISSIONS,0
@@ -104,6 +122,33 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             FamOneTheme {
+
+
+
+                //scanner
+                val scannerLauncher = rememberLauncherForActivityResult(
+                    contract = ActivityResultContracts.StartIntentSenderForResult(),
+                    onResult = {
+                        if(it.resultCode == RESULT_OK){
+                            val result = GmsDocumentScanningResult.fromActivityResultIntent(it.data)
+                            val imageUris = result?.pages?.map{it.imageUri} ?: emptyList()
+
+                            Intent(this@MainActivity, DocumentPreviewActivity::class.java).also{
+                                val docName = "Doc"+ Random.nextInt(20);
+                                val imgList = viewModel.getImagePathFromUri(ArrayList(imageUris),this)
+                                it.putExtra("document_name",docName)
+                                it.putExtra("image_list", imgList);
+
+                                ContextCompat.startActivity(this@MainActivity, it, null)
+                            }
+                        }
+
+                    }
+                )
+
+
+
+
 
                 val drawerItems = listOf(
 
@@ -223,7 +268,10 @@ class MainActivity : ComponentActivity() {
                                                 .clickable {
                                                     Intent(Intent.ACTION_GET_CONTENT).also {
                                                         it.type = "image/*"
-                                                        it.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
+                                                        it.putExtra(
+                                                            Intent.EXTRA_ALLOW_MULTIPLE,
+                                                            true
+                                                        )
                                                         startActivityForResult(it, 0)
                                                     }
                                                 },
@@ -234,17 +282,31 @@ class MainActivity : ComponentActivity() {
                                             modifier = Modifier
                                                 .size(50.dp)
                                                 .clickable {
-                                                    val REQUEST_IMAGE_CAPTURE = 1
-                                                    val takePictureIntent =
-                                                        Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-                                                    try {
-                                                        startActivityForResult(
-                                                            takePictureIntent,
-                                                            REQUEST_IMAGE_CAPTURE
-                                                        )
-                                                    } catch (e: ActivityNotFoundException) {
-                                                        // display error state to the user
-                                                    }
+//                                                    val REQUEST_IMAGE_CAPTURE = 1
+//                                                    val takePictureIntent =
+//                                                        Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+//                                                    try {
+//                                                        startActivityForResult(
+//                                                            takePictureIntent,
+//                                                            REQUEST_IMAGE_CAPTURE
+//                                                        )
+//                                                    } catch (e: ActivityNotFoundException) {
+//                                                        // display error state to the user
+//                                                    }
+
+                                                           scanner.getStartScanIntent(this@MainActivity)
+                                                               .addOnSuccessListener {
+                                                                   scannerLauncher.launch(
+                                                                       IntentSenderRequest.Builder(it).build()
+                                                                   )
+                                                               }
+                                                               .addOnFailureListener{
+                                                                   Toast.makeText(
+                                                                       applicationContext,
+                                                                       it.message,
+                                                                       Toast.LENGTH_LONG
+                                                                   ).show()
+                                                               }
                                                 },
                                             painter = painterResource(id = R.drawable.ic_open_camera_foreground),
                                             contentDescription = "open camera"

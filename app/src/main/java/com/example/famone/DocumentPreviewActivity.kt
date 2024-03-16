@@ -93,7 +93,9 @@ class DocumentPreviewActivity : ComponentActivity() {
 
 
 
-                val pagerState = rememberPagerState()
+                val pagerState = rememberPagerState(initialPage = 0, initialPageOffsetFraction = 0f){
+                    imageList?.size?:1
+                }
                 val textState = remember { mutableStateOf(TextFieldValue(documentName ?: "")) }
                 val keyboardController = LocalSoftwareKeyboardController.current
                 val isDateTimePickerVisible = remember { mutableStateOf(false) }
@@ -118,22 +120,22 @@ class DocumentPreviewActivity : ComponentActivity() {
                             finish()
                         }
                         if (imageList != null) {
-                            HorizontalPager(
-                                pageCount = imageList!!.size,
-                                state = pagerState,
-                                key = { imageList!![it] },
-                                pageSize = PageSize.Fill,
-                                modifier = Modifier
-                                    .padding(start = 16.dp, end = 16.dp, top = 12.dp)
-                                    .fillMaxWidth()
-                                    .height(200.dp)
-                            ) { index ->
-                                AsyncImage(
-                                    modifier = Modifier.fillMaxSize(),
-                                    model = imageList!![index],
-                                    contentDescription = "123"
-                                )
-                            }
+//                            HorizontalPager(
+//                                pageCount = imageList!!.size,
+//                                state = pagerState,
+//                                key = { imageList!![it] },
+//                                pageSize = PageSize.Fill,
+//                                modifier = Modifier
+//                                    .padding(start = 16.dp, end = 16.dp, top = 12.dp)
+//                                    .fillMaxWidth()
+//                                    .height(200.dp)
+//                            ) { index ->
+//                                AsyncImage(
+//                                    modifier = Modifier.fillMaxSize(),
+//                                    model = imageList!![index],
+//                                    contentDescription = "123"
+//                                )
+//                            }
                         }
                         // Title
                         OutlinedTextField(
