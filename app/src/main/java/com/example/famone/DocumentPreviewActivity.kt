@@ -29,6 +29,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material.icons.outlined.DateRange
+import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.KeyboardArrowDown
 import androidx.compose.material.icons.outlined.List
 import androidx.compose.material.icons.outlined.Notifications
@@ -58,6 +59,7 @@ import coil.compose.AsyncImage
 import com.example.famone.data.Document
 import com.example.famone.ui.theme.FamOneTheme
 import com.example.famone.ui.theme.composables.CategoryDropDown
+import com.example.famone.ui.theme.composables.DeleteConfirmationDialog
 import com.example.famone.ui.theme.composables.MyDatePickerDialog
 import com.example.famone.ui.theme.composables.MyToolbar
 import com.example.famone.utils.DateUtil
@@ -93,9 +95,7 @@ class DocumentPreviewActivity : ComponentActivity() {
                     documentName = document.title
                     imageList = image.split(",")
                 }
-
-
-
+                var isDeleteDialogVisible = remember { mutableStateOf(false) }
 
                 val pagerState = rememberPagerState(
                     initialPage = 0,
@@ -245,6 +245,27 @@ class DocumentPreviewActivity : ComponentActivity() {
                                 }
                         }
 
+                        //Delete document
+                        document?.let {
+                            Surface(
+                                modifier = Modifier
+                                    .padding(top = 16.dp, start = 16.dp, end = 16.dp)
+                                    .fillMaxWidth(),
+                                color = Color.Transparent,
+                                border = BorderStroke(1.dp, Color.LightGray),
+                                shape = RoundedCornerShape(4.dp)
+                            ) {
+                                Row( modifier = Modifier
+                                    .clickable {
+                                        isDeleteDialogVisible.value = true
+                                    }.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
+                                    Icon(modifier = Modifier.size(24.dp), imageVector = Icons.Outlined.Delete, contentDescription = "", tint = Color.White)
+                                    Text(modifier = Modifier.padding(start = 12.dp), text = "Delete Document", fontSize = 17.sp, color = Color.White)
+                                }
+                            }
+                        }
+
+
                         //Save button
                         Box(contentAlignment = Alignment.Center) {
                             Button(
@@ -291,6 +312,21 @@ class DocumentPreviewActivity : ComponentActivity() {
                                 },
                                 onDismiss = { isDateTimePickerVisible.value = false }
                             )
+                        }
+                        if(isDeleteDialogVisible.value){
+                            document?.let {
+                                DeleteConfirmationDialog(
+                                    onConfirm = {
+                                        isDeleteDialogVisible.value = false
+                                        viewModel.deleteDocumentById(this@DocumentPreviewActivity, it.documentId){
+                                            finish()
+                                        }
+                                    },
+                                    onDismiss = {
+                                        isDeleteDialogVisible.value = false
+                                    }
+                                )
+                            }
                         }
                     }
                 }

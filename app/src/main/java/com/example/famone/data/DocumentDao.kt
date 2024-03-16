@@ -30,4 +30,7 @@ interface DocumentDao {
     @Query("SELECT * FROM document WHERE reminder_time > 0 order by reminder_time asc")
     fun getDocumentByReminder() : List<Document>
 
+    @Query("DELETE FROM document WHERE document_id = :documentId")
+    fun deleteDocumentById(documentId: Int)
+
 }

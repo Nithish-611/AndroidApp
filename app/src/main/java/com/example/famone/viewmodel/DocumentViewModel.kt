@@ -59,6 +59,13 @@ class DocumentViewModel : ViewModel() {
         }
     }
 
+    fun deleteDocumentById(context: Context, documentId: Int, isDeleted: () -> Unit){
+        viewModelScope.launch(Dispatchers.IO) {
+           DocumentDatabase.getDatabase(context).dao.deleteDocumentById(documentId)
+            isDeleted()
+        }
+    }
+
 
 
     fun getImagePathFromUri(imageList:ArrayList<Uri>, context: Context): String {
