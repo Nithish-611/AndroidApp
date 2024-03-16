@@ -1,10 +1,12 @@
 package com.example.famone
 
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -25,14 +27,12 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
-import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
 import com.example.famone.ui.theme.FamOneTheme
-import com.example.famone.ui.theme.composables.CardItem
 import com.example.famone.utils.DocumentUtil
 
 class AllDocumentsActivity : ComponentActivity() {
@@ -43,7 +43,7 @@ class AllDocumentsActivity : ComponentActivity() {
 
         val categoryList = DocumentUtil.getCategories()
 
-        setContent{
+        setContent {
             FamOneTheme {
                 Scaffold(
                     topBar = {
@@ -54,7 +54,7 @@ class AllDocumentsActivity : ComponentActivity() {
                             },
                             navigationIcon = {
                                 IconButton(onClick = {
-
+                                    finish()
                                 }) {
                                     Icon(
                                         imageVector = Icons.Default.ArrowBack,
@@ -64,42 +64,55 @@ class AllDocumentsActivity : ComponentActivity() {
                             }
                         )
                     },
-                 content = {
-                    Column (
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(top = 32.dp)
-                            .background(Color.Black)
+                    content = {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(top = 32.dp, start = 16.dp, end = 16.dp)
+                                .background(Color.Black)
 
-                    ){
-                        Spacer(modifier = Modifier.height(56.dp))
-                        LazyVerticalGrid(
-                            columns = GridCells.Fixed(2),
-                            content = {
-                                items(categoryList){ item ->
-                                    Box (
-                                        modifier = Modifier
-                                            .padding(8.dp)
-                                            .aspectRatio(1f)
-                                            .background(
-                                                MaterialTheme.colorScheme.primary,
-                                                RoundedCornerShape(8.dp)
-                                            ),
-                                        contentAlignment = Alignment.Center
-                                    ){
-                                        Text(text = item)
+                        ) {
+                            Spacer(modifier = Modifier.height(56.dp))
+                            LazyVerticalGrid(
+                                columns = GridCells.Fixed(2),
+                                content = {
+                                    items(categoryList) { item ->
+                                        Box(
+                                            modifier = Modifier
+                                                .padding(8.dp)
+                                                .clickable {
+                                                    Intent(
+                                                        this@AllDocumentsActivity,
+                                                        ListDocumentsActivity::class.java
+                                                    ).also {
+                                                        it.putExtra("title", item)
+                                                        it.putExtra("category", item)
+                                                        ContextCompat.startActivity(
+                                                            this@AllDocumentsActivity,
+                                                            it,
+                                                            null
+                                                        )
+                                                    }
+                                                }
+                                                .aspectRatio(1f)
+                                                .background(
+                                                    MaterialTheme.colorScheme.primary,
+                                                    RoundedCornerShape(8.dp)
+                                                ),
+                                            contentAlignment = Alignment.Center
+                                        ) {
+                                            Text(text = item)
+                                        }
                                     }
                                 }
-                            }
-                        )
+                            )
+
+                        }
 
                     }
-
-                }
                 )
             }
         }
-
 
 
     }

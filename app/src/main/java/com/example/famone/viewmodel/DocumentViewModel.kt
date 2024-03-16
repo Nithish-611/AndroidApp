@@ -47,6 +47,12 @@ class DocumentViewModel : ViewModel() {
         }
     }
 
+    fun getDocumentByCategory(context: Context,category: String){
+        viewModelScope.launch(Dispatchers.IO) {
+            _docList.value = DocumentDatabase.getDatabase(context).dao.getDocumentByCategory(category)
+        }
+    }
+
 
 
     fun getImagePathFromUri(imageList:ArrayList<Uri>, context: Context): String {

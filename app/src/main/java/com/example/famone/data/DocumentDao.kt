@@ -24,4 +24,7 @@ interface DocumentDao {
     @Query("SELECT * FROM document WHERE document_id = :documentId")
     fun getDocumentById(documentId:Int) : List<Document>
 
+    @Query("SELECT * FROM document WHERE category_type = :category")
+    fun getDocumentByCategory(category: String) : List<Document>
+
 }
