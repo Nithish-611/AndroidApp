@@ -24,7 +24,8 @@ data class Document(
     val reminderTime: Long = 0L,
 
     @ColumnInfo(name="category_type")
-    val categoryType: String? = null,
+    val
+    categoryType: String? = null,
 
     @ColumnInfo(name="card_height")
     val cardHeight: Int = Random.nextInt(100,150)

@@ -160,9 +160,10 @@ class MainActivity : ComponentActivity() {
                                         selected = index == selectedItemIndex,
                                         onClick = {
                                             selectedItemIndex = index
-                                            scope.launch {
-                                                drawerState.close()
+                                            Intent(this@MainActivity,AllDocumentsActivity::class.java).also {
+                                                startActivity(it)
                                             }
+
                                         },
                                         icon = {
                                             Icon(
