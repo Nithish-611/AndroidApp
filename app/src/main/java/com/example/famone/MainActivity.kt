@@ -158,11 +158,11 @@ class MainActivity : ComponentActivity() {
 
                 val drawerItems = listOf(
 
-                    NavigationItem(
-                        title = "My Profile",
-                        selectedIcon = Icons.Filled.Person,
-                        unselectedIcon = Icons.Outlined.Person,
-                    ),
+//                    NavigationItem(
+//                        title = "My Profile",
+//                        selectedIcon = Icons.Filled.Person,
+//                        unselectedIcon = Icons.Outlined.Person,
+//                    ),
 
                     NavigationItem(
                         title = "All Documents",
@@ -174,16 +174,16 @@ class MainActivity : ComponentActivity() {
                         selectedIcon = Icons.Filled.Notifications,
                         unselectedIcon = Icons.Outlined.Notifications,
                     ),
-                    NavigationItem(
-                        title = "Tools",
-                        selectedIcon = Icons.Filled.Create,
-                        unselectedIcon = Icons.Outlined.Create,
-                    ),
-                    NavigationItem(
-                        title = "Settings",
-                        selectedIcon = Icons.Filled.Settings,
-                        unselectedIcon = Icons.Outlined.Settings,
-                    )
+//                    NavigationItem(
+//                        title = "Tools",
+//                        selectedIcon = Icons.Filled.Create,
+//                        unselectedIcon = Icons.Outlined.Create,
+//                    ),
+//                    NavigationItem(
+//                        title = "Settings",
+//                        selectedIcon = Icons.Filled.Settings,
+//                        unselectedIcon = Icons.Outlined.Settings,
+//                    )
                 )
 
                 Surface(
@@ -212,13 +212,13 @@ class MainActivity : ComponentActivity() {
                                         onClick = {
                                             selectedItemIndex = index
                                             when(index){
-                                                0 -> {}
-                                                1 -> {
+
+                                                0 -> {
                                                     Intent(this@MainActivity,AllDocumentsActivity::class.java).also {
                                                         startActivity(it)
                                                     }
                                                 }
-                                                2 -> {
+                                                1 -> {
                                                     Intent(
                                                         this@MainActivity,
                                                         ListDocumentsActivity::class.java
