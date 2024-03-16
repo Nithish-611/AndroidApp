@@ -70,6 +70,7 @@ class DocumentPreviewActivity : ComponentActivity() {
         viewModel = ViewModelProvider(this)[DocumentViewModel::class.java]
         var documentName = intent.getStringExtra("document_name")
         val imageListString = intent.getStringExtra("image_list")
+        val category = intent.getStringExtra("category")?:"Miscellaneous"
         var imageList = imageListString?.split(",")
         if(imageListString==null){
             val documentId = intent.getIntExtra("document_id", 0)
@@ -105,7 +106,7 @@ class DocumentPreviewActivity : ComponentActivity() {
                 val keyboardController = LocalSoftwareKeyboardController.current
                 val isDateTimePickerVisible = remember { mutableStateOf(false) }
                 val isCategoryDropDownVisible = remember { mutableStateOf(false) }
-                val selectedCategory = remember { mutableStateOf(document?.categoryType?:"Miscellaneous") }
+                val selectedCategory = remember { mutableStateOf(document?.categoryType?:category) }
                 val date = remember {
                     mutableStateOf(DateUtil.millisToDate(document?.reminderTime))
                 }

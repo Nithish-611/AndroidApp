@@ -288,31 +288,19 @@ class MainActivity : ComponentActivity() {
                                             modifier = Modifier
                                                 .size(50.dp)
                                                 .clickable {
-//                                                    val REQUEST_IMAGE_CAPTURE = 1
-//                                                    val takePictureIntent =
-//                                                        Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-//                                                    try {
-//                                                        startActivityForResult(
-//                                                            takePictureIntent,
-//                                                            REQUEST_IMAGE_CAPTURE
-//                                                        )
-//                                                    } catch (e: ActivityNotFoundException) {
-//                                                        // display error state to the user
-//                                                    }
-
-                                                           scanner.getStartScanIntent(this@MainActivity)
-                                                               .addOnSuccessListener {
-                                                                   scannerLauncher.launch(
-                                                                       IntentSenderRequest.Builder(it).build()
-                                                                   )
-                                                               }
-                                                               .addOnFailureListener{
-                                                                   Toast.makeText(
-                                                                       applicationContext,
-                                                                       it.message,
-                                                                       Toast.LENGTH_LONG
-                                                                   ).show()
-                                                               }
+                                                   scanner.getStartScanIntent(this@MainActivity)
+                                                       .addOnSuccessListener {
+                                                           scannerLauncher.launch(
+                                                               IntentSenderRequest.Builder(it).build()
+                                                           )
+                                                       }
+                                                       .addOnFailureListener{
+                                                           Toast.makeText(
+                                                               applicationContext,
+                                                               it.message,
+                                                               Toast.LENGTH_LONG
+                                                           ).show()
+                                                       }
                                                 },
                                             painter = painterResource(id = R.drawable.ic_open_camera_foreground),
                                             contentDescription = "open camera"
@@ -445,14 +433,13 @@ class MainActivity : ComponentActivity() {
                 if (singleImageUri != null) {
                     imageList.add(singleImageUri)
                 }
-                // Process the single image URI here
             }
 
             Intent(this@MainActivity, DocumentPreviewActivity::class.java).also{
                 val docName = "Doc"+ Random.nextInt(20);
                 val imgList = viewModel.getImagePathFromUri(imageList,this)
                 it.putExtra("document_name",docName)
-                it.putExtra("image_list", imgList);
+                it.putExtra("image_list", imgList)
 
                 ContextCompat.startActivity(this@MainActivity, it, null)
             }
