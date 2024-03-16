@@ -1,6 +1,9 @@
 package com.example.famone
 
+import android.content.Intent
+import android.os.Build
 import android.os.Bundle
+import android.provider.Settings
 import android.text.TextUtils
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -227,7 +230,15 @@ class DocumentPreviewActivity : ComponentActivity() {
                         ) {
                             Row( modifier = Modifier
                                 .clickable {
-                                    NotificationUtil.triggerDummyNotification(applicationContext)
+                                    if(NotificationUtil.hasNotificationPermission(this@DocumentPreviewActivity)){
+                                        NotificationUtil.triggerDummyNotification(applicationContext)
+                                    }else{
+                                        val intent = Intent().apply {
+                                            action = Settings.ACTION_APP_NOTIFICATION_SETTINGS
+                                            putExtra(Settings.EXTRA_APP_PACKAGE, this@DocumentPreviewActivity.packageName)
+                                        }
+                                        this@DocumentPreviewActivity.startActivity(intent)
+                                    }
                                 }.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
                                     Icon(modifier = Modifier.size(24.dp), imageVector = Icons.Outlined.Notifications, contentDescription = "", tint = Color.White)
                                     Text(modifier = Modifier.padding(start = 12.dp), text = "Trigger Notification", fontSize = 17.sp, color = Color.White)
